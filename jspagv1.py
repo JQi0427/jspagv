@@ -14,24 +14,26 @@ class Encode:
         self.num = num
 
     def initMachineSequence(self):
+        population_MSlist = []
         for i in range(self.population_size):
             nxm_random_num = list(
                 np.random.permutation(self.num))  # generate a random permutation of 0 to num_job*num_mc-1
-            self.ms.append(nxm_random_num)  # add to the machine_sequence
+            population_MSlist.append(nxm_random_num)  # add to the machine_sequence
             for j in range(self.num):
-                self.ms[i][j] = self.ms[i][
+                population_MSlist[i][j] = population_MSlist[i][
                                             j] % self.J_num  # convert to job number format, every job appears m times
-        return self.ms
+        return population_MSlist
 
     def initAGVSequence(self):
+        population_AGVlist = []
         for i in range(self.population_size):
             nxm_random_num = list(
                 np.random.permutation(self.num))  # generate a random permutation of 0 to num_job*num_mc-1
-            self.agv.append(nxm_random_num)  # add to the machine_sequence
+            population_AGVlist.append(nxm_random_num)  # add to the machine_sequence
             for j in range(self.num):
-                self.agv[i][j] = self.agv[i][
+                population_AGVlist[i][j] = population_AGVlist[i][
                                             j] % self.A_num  # convert to job number format, every job appears m times
-        return agv
+        return population_AGVlist
 
 
 pt_tmp = pd.read_excel("JSP_dataset.xlsx", sheet_name="Processing Time", index_col=[0])
@@ -49,7 +51,7 @@ population_size = 1
 num = J_num * M_num
 pt = [list(map(int, pt_tmp.iloc[i])) for i in range(J_num)]  # process time
 ms = [list(map(int, ms_tmp.iloc[i])) for i in range(J_num)]  # machine sequence
-agv = [list(map(int, ms_tmp.iloc[i])) for i in range(J_num)]  # AGV sequence
+agv = [list(map(int, at_tmp.iloc[i])) for i in range(J_num)]  # AGV sequence
 
 JSPAGV = Encode(pt, ms, agv, J_num, M_num, A_num, population_size, num)
 
