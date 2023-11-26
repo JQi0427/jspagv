@@ -13,16 +13,16 @@ class Encode:
         self.population_size = population_size
         self.num = num
 
-    def initMachineSequence(self):
-        population_MSlist = []
+    def initJobSequence(self):
+        population_joblist = []
         for i in range(self.population_size):
             nxm_random_num = list(
                 np.random.permutation(self.num))  # generate a random permutation of 0 to num_job*num_mc-1
-            population_MSlist.append(nxm_random_num)  # add to the machine_sequence
+            population_joblist.append(nxm_random_num)  # add to the job_sequence
             for j in range(self.num):
-                population_MSlist[i][j] = population_MSlist[i][
+                population_joblist[i][j] = population_joblist[i][
                                             j] % self.J_num  # convert to job number format, every job appears m times
-        return population_MSlist
+        return population_joblist
 
     def initAGVSequence(self):
         population_AGVlist = []
@@ -55,5 +55,18 @@ agv = [list(map(int, at_tmp.iloc[i])) for i in range(J_num)]  # AGV sequence
 
 JSPAGV = Encode(pt, ms, agv, J_num, M_num, A_num, population_size, num)
 
-print(JSPAGV.initMachineSequence())
+init_jobs = JSPAGV.initJobSequence()
+print(init_jobs)
 print(JSPAGV.initAGVSequence())
+
+# 计算最大机器完工时间
+init_time = [0] * 10
+init_sequence = [0] * 10
+for i in range(num):
+    temp_job = init_jobs[0][i]
+    temp_machine = ms[temp_job][init_sequence[temp_job]] - 1
+    init_time[temp_machine] += pt[temp_job][init_sequence[temp_job]]
+    init_sequence[temp_job] += 1
+
+print("机器的运行时间：", init_time)
+print(f"机器的最大运行时间来自机器{init_time.index(max(init_time)) + 1},时间为：{max(init_time)}")
