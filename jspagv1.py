@@ -67,4 +67,4 @@ for i in range(num):
     init_sequence[temp_job] += 1
 
 print("机器的运行时间：", init_time)
-print(f"机器的最大运行时间来自机器{init_time.index(max(init_time)) + 1},时间为：{max(init_time)}")
+print(f"机器的最大运行时间来自机器{init_time.index(max(init_time)) },时间为：{max(init_time)}")
