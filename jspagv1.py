@@ -62,7 +62,7 @@ init_time = [0] * M_num
 init_sequence = [0] * M_num
 for i in range(num):
     temp_job = init_jobs[0][i]
-    temp_machine = ms[temp_job][init_sequence[temp_job]] - 1
+    temp_machine = ms[temp_job][init_sequence[temp_job]]
     init_time[temp_machine] += pt[temp_job][init_sequence[temp_job]]
     init_sequence[temp_job] += 1
 
