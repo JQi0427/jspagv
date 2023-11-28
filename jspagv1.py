@@ -40,12 +40,10 @@ pt_tmp = pd.read_excel("JSP_dataset.xlsx", sheet_name="Processing Time", index_c
 ms_tmp = pd.read_excel("JSP_dataset.xlsx", sheet_name="Machines Sequence", index_col=[0])
 at_tmp = pd.read_excel("JSP_dataset.xlsx", sheet_name="AGV Time", index_col=[0])
 
-# dfshape = pt_tmp.shape
-# num_mc = dfshape[1]  # number of machines
-# num_job = dfshape[0]  # number of jobs
+dfshape = pt_tmp.shape
+J_num = dfshape[0]
+M_num = dfshape[1]
 
-J_num = 10
-M_num = 10
 A_num = 3
 population_size = 1
 num = J_num * M_num
@@ -60,8 +58,8 @@ print(init_jobs)
 print(JSPAGV.initAGVSequence())
 
 # 计算最大机器完工时间
-init_time = [0] * 10
-init_sequence = [0] * 10
+init_time = [0] * M_num
+init_sequence = [0] * M_num
 for i in range(num):
     temp_job = init_jobs[0][i]
     temp_machine = ms[temp_job][init_sequence[temp_job]] - 1
