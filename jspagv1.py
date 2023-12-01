@@ -36,9 +36,9 @@ class Encode:
         return population_AGVlist
 
 
-pt_tmp = pd.read_excel("JSP_dataset.xlsx", sheet_name="Processing Time", index_col=[0])
-ms_tmp = pd.read_excel("JSP_dataset.xlsx", sheet_name="Machines Sequence", index_col=[0])
-at_tmp = pd.read_excel("JSP_dataset.xlsx", sheet_name="AGV Time", index_col=[0])
+pt_tmp = pd.read_excel("JSP_dataset_ft06.xlsx", sheet_name="Processing Time", index_col=[0])
+ms_tmp = pd.read_excel("JSP_dataset_ft06.xlsx", sheet_name="Machines Sequence", index_col=[0])
+at_tmp = pd.read_excel("JSP_dataset_ft06.xlsx", sheet_name="AGV Time", index_col=[0])
 
 dfshape = pt_tmp.shape
 J_num = dfshape[0]
@@ -63,21 +63,25 @@ init_time = [0] * M_num
 init_sequence = [0] * M_num
 for i in range(num):
     temp_job = init_jobs[0][i]
-    temp_machine = ms[temp_job][init_sequence[temp_job]] - 1
+    temp_machine = ms[temp_job][init_sequence[temp_job]]
     init_time[temp_machine] += pt[temp_job][init_sequence[temp_job]]
     init_sequence[temp_job] += 1
 
 print("机器的运行时间：", init_time)
-print(f"机器的最大运行时间来自机器{init_time.index(max(init_time)) + 1},时间为：{max(init_time)}")
+print(f"机器的最大运行时间来自机器{init_time.index(max(init_time))},时间为：{max(init_time)}")
 
 # 计算含AGV的最大完工时间
 init_agv = JSPAGV.initAGVSequence()
 init_time = [0] * M_num
 init_sequence = [0] * M_num
 for i in range(num):
-    temp_job = init_jobs[0][i]  # 获取工序
-    temp_machine = ms[temp_job][init_sequence[temp_job]] - 1  # 获取对应的机器
-    temp_agv = init_agv[0][i]  # 获取对应的agv
+    temp_job = init_jobs[0][i]  # achieve job operation
+    temp_machine = ms[temp_job][init_sequence[temp_job]]   # achieve related machine Mn+1
+    if init_sequence[temp_job] != 0:
+        last_machine = ms[temp_job][init_sequence[temp_job]-1]   # Gets the machine where the workpiece was located in the previous operation
+    temp_agv = init_agv[0][i]  # achieve related agv sequence
+    init_sequence[temp_job] += 1
+
 
 
 
