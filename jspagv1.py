@@ -13,6 +13,7 @@ class Encode:
         self.population_size = population_size
         self.num = num  # Iteration
         self.agv_num = agv_num  # AGV iteration
+
     def initJobSequence(self):
         population_joblist = []
         for i in range(self.population_size):
@@ -51,7 +52,7 @@ agv_num = (M_num+2)*(M_num+2)
 pt = [list(map(int, pt_tmp.iloc[i])) for i in range(J_num)]  # process time
 ms = [list(map(int, ms_tmp.iloc[i])) for i in range(J_num)]  # machine sequence
 agv = [list(map(int, at_tmp.iloc[i])) for i in range(M_num+2)]  # AGV sequence
-print("agv",agv)
+print("agv", agv)
 
 
 JSPAGV = Encode(pt, ms, agv, J_num, M_num, A_num, population_size, num, agv_num)
@@ -69,8 +70,8 @@ for i in range(num):
     init_time[temp_machine] += pt[temp_job][init_sequence[temp_job]]
     init_sequence[temp_job] += 1
 
-#print("机器的运行时间：", init_time)
-#print(f"机器的最大运行时间来自机器{init_time.index(max(init_time))},时间为：{max(init_time)}")
+# print("机器的运行时间：", init_time)
+# print(f"机器的最大运行时间来自机器{init_time.index(max(init_time))},时间为：{max(init_time)}")
 
 # 计算含AGV的最大完工时间
 init_agv = JSPAGV.initAGVSequence()
@@ -80,21 +81,23 @@ init_sequence = [0] * M_num
 boolean_agv = [0]*3  # 布尔型变量，如果agv空闲为0，agv不空闲则为1
 location_agv = [0]*3  # agv位置初始化都在仓库
 for i in range(num):
-    temp_job = init_jobs[0][i]  # achieve job operation
-    temp_machine = ms[temp_job][init_sequence[temp_job]]   # achieve related machine Mn+1
-    temp_agv = init_agv[0][i]  # achieve related agv sequence
+    temp_job = init_jobs[0][i]  # 实现工件序列
+    temp_machine = ms[temp_job][init_sequence[temp_job]]   # 实现机器序列
+    temp_agv = init_agv[0][i]  # 实现AGV序列
     if init_sequence[temp_job] != 0:
-        last_machine = ms[temp_job][init_sequence[temp_job]-1]  # Gets the machine where the workpiece was located in the previous operation
+        # 获取上一次操作中工件所在的机器
+        last_machine = ms[temp_job][init_sequence[temp_job]-1]
 
     else:  # 目前操作是工件的第一个工序时
         if boolean_agv[temp_agv] == 0:  # 判断agv是否空闲
-            machine =  ms[temp_job][init_sequence[temp_job]]
+            machine = ms[temp_job][init_sequence[temp_job]]
             if agv[temp_agv] == 0:  # agv在仓库
-                init_time[temp_machine] = init_time[temp_machine] + pt[temp_job][init_sequence[temp_job]] + agv[0][machine]  # 计算agv在仓库的时间
+                init_time[temp_machine] = init_time[temp_machine] + pt[temp_job][init_sequence[temp_job]]\
+                                          + agv[0][machine]  # 计算agv在仓库的时间
                 location_agv[temp_agv] = machine  # 记录该agv完成任务后的位置
             else:  # agv不在仓库
-                init_time[temp_machine] = init_time[temp_machine] + pt[temp_job][init_sequence[temp_job]] + agv[0][
-                    machine] + agv[0][location_agv[temp_agv]]
+                init_time[temp_machine] = init_time[temp_machine] + pt[temp_job][init_sequence[temp_job]]\
+                                          + agv[0][machine] + agv[0][location_agv[temp_agv]]
                 location_agv[temp_agv] = machine  # 记录该agv完成任务后的位置
     init_sequence[temp_job] += 1
 
