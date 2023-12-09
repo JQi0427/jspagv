@@ -125,7 +125,7 @@ for i in range(num):
                         temp_machine + 1] + agv[location_agv[temp_agv]][last_machine] + difference
             location_agv[temp_agv] = temp_machine + 1  # 记录该agv完成任务后的位置
             process_time[temp_agv] = pt[temp_job][init_sequence[temp_job]]
-    if init_sequence[temp_job] == 0:  # 目前操作是工件的第一个工序时
+    else:  # 目前操作是工件的第一个工序时
         if boolean_agv[temp_agv] == 0:  # 判断agv是否空闲,0:空闲
             if location_agv[temp_agv] == 0:  # agv在仓库
                 init_time[temp_machine] += + pt[temp_job][init_sequence[temp_job]] + agv[0][temp_machine+1]  # 计算agv在仓库的时间
@@ -136,11 +136,13 @@ for i in range(num):
                                       agv[0][location_agv[temp_agv]]
                 location_agv[temp_agv] = temp_machine+1  # 记录该agv完成任务后的位置
                 process_time[temp_agv] = pt[temp_job][init_sequence[temp_job]]
+   # if init_sequence[temp_job] == 5:
+      #  init_time[temp_machine] += agv[][]
     init_sequence[temp_job] += 1
 print(init_time)
 
-
-
+# [[1, 2, 5, 5, 1, 0, 3, 4, 4, 1
+# [[0, 1, 0, 2, 1, 1, 0, 2, 1, 2,
 
 
 
