@@ -70,18 +70,25 @@ init_time = [0] * M_num
 init_sequence = [0] * M_num
 boolean_agv = [0]*3  # 布尔型变量，如果agv空闲为0，agv不空闲则为1
 location_agv = [0]*3  # agv位置初始化都在仓库
-process_time = [0]*3 # 记录agv不空闲时，那台机器上的ps
-t = 1
+process_time = [0]*3  # 记录agv不空闲时，那台机器上的pt，如现在agv从机器晕运输到机器二，记录该工件在机器二上的加工时间
+t = len(init_agv[0]) - 1
+lasttime = [0]*3  # 记录agv运输成品到成品库的时间
 for i in range(num):
     temp_job = init_jobs[0][i]  # achieve job operation
     temp_machine = ms[temp_job][init_sequence[temp_job]]   # achieve related machine Mn+1
     temp_agv = init_agv[0][i]  # achieve related agv sequence
-    if init_sequence[temp_job] != 0:
+    if init_sequence[temp_job] != 0:  # 不是工件的第一个工序
         # Gets the machine where the workpiece was located in the previous operation
         last_machine = ms[temp_job][init_sequence[temp_job]-1] + 1
-        machine = location_agv[temp_agv] - 1
-        temp_time = init_time[machine] - process_time[temp_agv]  # 该agv到达上一个任务的时间
-        if init_time[temp_machine] > temp_time:
+        if location_agv[temp_agv] != 0:  # 避免agv在初始化位置仓库产生的影响
+            machine = location_agv[temp_agv] - 1  # agv在上一个任务结束时的位置
+            if machine != 6:
+                temp_time = init_time[machine] - process_time[temp_agv]  # 该agv到达上一个任务的时间，上一个机器的时间减去加工时间 = agv到达时间
+            else:
+                temp_time = lasttime[temp_agv]
+        else:
+            temp_time = 0
+        if init_time[temp_machine] > temp_time:  # 对比agv达到上一个任务的结束时间和该任务的起始时间，判断agv是否空闲
             boolean_agv[temp_agv] = 0
         else:
             boolean_agv[temp_agv] = 1
@@ -96,7 +103,7 @@ for i in range(num):
                                            agv[location_agv[temp_agv]][last_machine] - time
             else:
                 time = init_time[last_machine - 1] - init_time[temp_machine]
-                if time > agv[location_agv[temp_agv]][last_machine - 1]:
+                if time > agv[location_agv[temp_agv]][last_machine - 1]:  # 上一个工序没完成
                     init_time[temp_machine] += pt[temp_job][init_sequence[temp_job]] + agv[last_machine][
                         temp_machine + 1] + time
                 else:
@@ -104,7 +111,7 @@ for i in range(num):
                         temp_machine + 1] + agv[location_agv[temp_agv]][last_machine]
             location_agv[temp_agv] = temp_machine + 1  # 记录该agv完成任务后的位置
             process_time[temp_agv] = pt[temp_job][init_sequence[temp_job]]
-        else:
+        else:  # agv不空闲
             # 用agv到达机器的时间和当前时间对比，算出等待agv的时间
             difference = temp_time - init_time[temp_machine]
             # 判断该工件的前一个工序是否完成
@@ -136,13 +143,32 @@ for i in range(num):
                                       agv[0][location_agv[temp_agv]]
                 location_agv[temp_agv] = temp_machine+1  # 记录该agv完成任务后的位置
                 process_time[temp_agv] = pt[temp_job][init_sequence[temp_job]]
-   # if init_sequence[temp_job] == 5:
-      #  init_time[temp_machine] += agv[][]
+    if init_sequence[temp_job] == 5:  # 计算从机器上运输到产品库的时间
+       a = init_agv[0][t]  # 获取分配的agv
+       if location_agv[a] - 1 != 6:
+           temp_time = init_time[location_agv[a] - 1] - process_time[a]  # 该agv到达上一个任务的时间，上一个机器的时间减去加工时间 = agv到达时间
+       else:
+           temp_time = lasttime[a]
+       if init_time[temp_machine] > temp_time:  # 对比agv达到上一个任务的结束时间和该任务的起始时间，判断agv是否空闲
+           boolean_agv[a] = 0
+       else:
+           boolean_agv[a] = 1
+       if boolean_agv[a] == 0:  # 判断agv是否空闲,0:空闲
+           if init_time[temp_machine] - temp_time > agv[location_agv[a]][temp_machine + 1]:
+            init_time[temp_machine] += agv[temp_machine + 1][7]
+           else:
+               init_time[temp_machine] += agv[location_agv[a]][temp_machine + 1] - (init_time[temp_machine] - temp_time) + \
+                                          agv[temp_machine + 1][7]
+       else:
+           init_time[temp_machine] += temp_time - init_time[temp_machine] + agv[location_agv[a]][temp_machine + 1] + \
+                                      agv[temp_machine + 1][7]
+       location_agv[a] = 7
+       t = t-1
+       lasttime[a] = init_time[temp_machine]
     init_sequence[temp_job] += 1
 print(init_time)
 
-# [[1, 2, 5, 5, 1, 0, 3, 4, 4, 1
-# [[0, 1, 0, 2, 1, 1, 0, 2, 1, 2,
+
 
 
 
