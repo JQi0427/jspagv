@@ -55,35 +55,36 @@ class Encode:
                 offspring_list[S[2 * m]] = child_1[:]
                 offspring_list[S[2 * m + 1]] = child_2[:]
 
-                for m in range(self.population_size):
-                    job_count = {}
-                    larger, less = [], []
-                    for i in range(self.J_num):
-                        if i in offspring_list[m]:
-                            count = offspring_list[m].count(i)
-                            pos = offspring_list[m].index(i)
-                            job_count[i] = [count, pos]
-                        else:
-                            count = 0
-                            job_count[i] = [count, 0]
-                        if count > self.M_num:
-                            larger.append(i)
-                        elif count < self.M_num:
-                            less.append(i)
+            for m in range(self.population_size):
+                job_count = {}
+                larger, less = [], []
+                for i in range(self.J_num):
+                    if i in offspring_list[m]:
+                        count = offspring_list[m].count(i)
+                        pos = offspring_list[m].index(i)
+                        job_count[i] = [count, pos]
+                    else:
+                        count = 0
+                        job_count[i] = [count, 0]
+                    if count > self.M_num:
+                        larger.append(i)
+                    elif count < self.M_num:
+                        less.append(i)
 
-                    for k in range(len(larger)):
-                        chg_job = larger[k]
-                        while job_count[chg_job][0] > self.M_num:  # 使用self前缀
-                            for d in range(len(less)):
-                                if job_count[less[d]][0] < self.M_num:  # 使用self前缀
-                                    index = [i for i in range(len(offspring_list[m])) if
-                                             offspring_list[m][i] == chg_job]
-                                    offspring_list[m][index[0]] = less[d]
-                                    job_count[chg_job][1] = index[0]  # 使用索引变量
-                                    job_count[chg_job][0] = job_count[chg_job][0] - 1
-                                    job_count[less[d]][0] = job_count[less[d]][0] + 1
-                                if job_count[chg_job][0] == self.M_num:  # 使用self前缀
-                                    break
+                for k in range(len(larger)):
+                    chg_job = larger[k]
+                    while job_count[chg_job][0] > self.M_num:
+                        for d in range(len(less)):
+                            if job_count[less[d]][0] < self.M_num:
+                                index = [i for i in range(len(offspring_list[m])) if
+                                         offspring_list[m][i] == chg_job]
+                                offspring_list[m][index[0]] = less[d]
+                                job_count[chg_job][1] = index[0]
+                                job_count[chg_job][0] = job_count[chg_job][0] - 1
+                                job_count[less[d]][0] = job_count[less[d]][0] + 1
+                            if job_count[chg_job][0] == self.M_num:
+                                break
+
         return offspring_list
 
 
@@ -114,5 +115,6 @@ start_time = time.time()
 JSPAGV = Encode(pt, ms, agv, J_num, M_num, A_num, population_size, num, agv_num)
 
 offspring_jobs = JSPAGV.initJobSequence()
+
 print("交叉后的种群列表：", offspring_jobs)
-print()
+
