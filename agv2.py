@@ -17,7 +17,7 @@ class Encode:
 
     def initAGVSequence(self):
         population_AGVlist = []
-        for i in range(self.population_size):
+        for i in range(int(self.population_size / 2)):
             nxm_random_num = list(
                 np.random.permutation(self.agv_num))  # generate a random permutation of 0 to num_job*num_mc-1
             population_AGVlist.append(nxm_random_num)  # add to the machine_sequence
@@ -99,7 +99,6 @@ M_num = dfshape[1]
 
 
 A_num = 3
-population_size = 1
 num = J_num * M_num
 agv_num = M_num*(M_num+1)
 pt = [list(map(int, pt_tmp.iloc[i])) for i in range(J_num)]  # process time
@@ -117,4 +116,5 @@ JSPAGV = Encode(pt, ms, agv, J_num, M_num, A_num, population_size, num, agv_num)
 offspring_jobs = JSPAGV.initJobSequence()
 
 print("交叉后的种群列表：", offspring_jobs)
-
+init_agv = JSPAGV.initAGVSequence()
+print("agv序列：",init_agv)
