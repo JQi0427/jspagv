@@ -15,43 +15,6 @@ class Encode:
         self.num = num  # Iteration
         self.agv_num = agv_num  # AGV iteration¥
 
-
-pt_tmp = pd.read_excel("JSP_dataset_ft06.xlsx", sheet_name="Processing Time", index_col=[0])
-ms_tmp = pd.read_excel("JSP_dataset_ft06.xlsx", sheet_name="Machines Sequence", index_col=[0])
-at_tmp = pd.read_excel("JSP_dataset_ft06.xlsx", sheet_name="AGV Time", index_col=[0])
-
-dfshape = pt_tmp.shape
-J_num = dfshape[0]
-M_num = dfshape[1]
-
-
-A_num = 3
-population_size = 1
-num = J_num * M_num
-agv_num = M_num*(M_num+1)
-pt = [list(map(int, pt_tmp.iloc[i])) for i in range(J_num)]  # process time
-ms = [list(map(int, ms_tmp.iloc[i])) for i in range(J_num)]  # machine sequence
-agv = [list(map(int, at_tmp.iloc[i])) for i in range(M_num+2)]  # AGV sequence
-
-population_size =  2 # default value is 30
-crossover_rate = 0.8 # default value is 0.8
-
-
-start_time = time.time()
-
-
-class Encode:
-    def __init__(self, pt, ms, agv, J_num, M_num, A_num, population_size, num, agv_num):
-        self.pt = pt  # processing time
-        self.ms = ms  # machine sequence
-        self.agv = agv  # AGV transform time
-        self.J_num = J_num  # Job num
-        self.M_num = M_num  # Machine num
-        self.A_num = A_num  # AGV num
-        self.population_size = population_size
-        self.num = num  # Iteration
-        self.agv_num = agv_num  # AGV iteration¥
-
     def initJobSequence(self):
         population_joblist = []
         for i in range(self.population_size):
@@ -80,36 +43,31 @@ class Encode:
                 child_2[cutpoint[0]:cutpoint[1]] = parent_1[cutpoint[0]:cutpoint[1]]
                 offspring_list[S[2 * m]] = child_1[:]
                 offspring_list[S[2 * m + 1]] = child_2[:]
-
-        for m in range(self.population_size):  # 修改了空格缩进
-            job_count = {}
-            larger, less = [], []
-            for i in range(self.J_num):  # 使用self前缀
-                if i in offspring_list[m]:
-                    count = offspring_list[m].count(i)
-                    pos = offspring_list[m].index(i)
-                    job_count[i] = [count, pos]
-                else:
-                    count = 0
-                    job_count[i] = [count, 0]
-                if count > self.M_num:  # 使用self前缀
-                    larger.append(i)
-                elif count < self.M_num:  # 使用self前缀
-                    less.append(i)
-
-            for k in range(len(larger)):
-                chg_job = larger[k]
-                while job_count[chg_job][0] > self.M_num:  # 使用self前缀
-                    for d in range(len(less)):
-                        if job_count[less[d]][0] < self.M_num:  # 使用self前缀
-                            index = [i for i in range(len(offspring_list[m])) if offspring_list[m][i] == chg_job]
-                            offspring_list[m][index[0]] = less[d]
-                            job_count[chg_job][1] = index[0]  # 使用索引变量
-                            job_count[chg_job][0] = job_count[chg_job][0] - 1
-                            job_count[less[d]][0] = job_count[less[d]][0] + 1
-                        if job_count[chg_job][0] == self.M_num:  # 使用self前缀
-                            break
         return offspring_list
+
+pt_tmp = pd.read_excel("JSP_dataset_ft06.xlsx", sheet_name="Processing Time", index_col=[0])
+ms_tmp = pd.read_excel("JSP_dataset_ft06.xlsx", sheet_name="Machines Sequence", index_col=[0])
+at_tmp = pd.read_excel("JSP_dataset_ft06.xlsx", sheet_name="AGV Time", index_col=[0])
+
+dfshape = pt_tmp.shape
+J_num = dfshape[0]
+M_num = dfshape[1]
+
+
+A_num = 3
+population_size = 1
+num = J_num * M_num
+agv_num = M_num*(M_num+1)
+pt = [list(map(int, pt_tmp.iloc[i])) for i in range(J_num)]  # process time
+ms = [list(map(int, ms_tmp.iloc[i])) for i in range(J_num)]  # machine sequence
+agv = [list(map(int, at_tmp.iloc[i])) for i in range(M_num+2)]  # AGV sequence
+
+population_size =  2 # default value is 30
+crossover_rate = 0.8 # default value is 0.8
+
+
+start_time = time.time()
+
 JSPAGV = Encode(pt, ms, agv, J_num, M_num, A_num, population_size, num, agv_num)
 
 offspring_jobs = JSPAGV.initJobSequence()
