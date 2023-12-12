@@ -13,7 +13,18 @@ class Encode:
         self.A_num = A_num  # AGV num
         self.population_size = population_size
         self.num = num  # Iteration
-        self.agv_num = agv_num  # AGV iteration¥
+        self.agv_num = agv_num  # AGV iteration
+
+    def initAGVSequence(self):
+        population_AGVlist = []
+        for i in range(self.population_size):
+            nxm_random_num = list(
+                np.random.permutation(self.agv_num))  # generate a random permutation of 0 to num_job*num_mc-1
+            population_AGVlist.append(nxm_random_num)  # add to the machine_sequence
+            for j in range(self.agv_num):
+                population_AGVlist[i][j] = population_AGVlist[i][
+                                            j] % self.A_num  # convert to job number format, every job appears m times
+        return population_AGVlist
 
     def initJobSequence(self):
         population_joblist = []
@@ -43,7 +54,39 @@ class Encode:
                 child_2[cutpoint[0]:cutpoint[1]] = parent_1[cutpoint[0]:cutpoint[1]]
                 offspring_list[S[2 * m]] = child_1[:]
                 offspring_list[S[2 * m + 1]] = child_2[:]
+
+                for m in range(self.population_size):
+                    job_count = {}
+                    larger, less = [], []
+                    for i in range(self.J_num):
+                        if i in offspring_list[m]:
+                            count = offspring_list[m].count(i)
+                            pos = offspring_list[m].index(i)
+                            job_count[i] = [count, pos]
+                        else:
+                            count = 0
+                            job_count[i] = [count, 0]
+                        if count > self.M_num:
+                            larger.append(i)
+                        elif count < self.M_num:
+                            less.append(i)
+
+                    for k in range(len(larger)):
+                        chg_job = larger[k]
+                        while job_count[chg_job][0] > self.M_num:  # 使用self前缀
+                            for d in range(len(less)):
+                                if job_count[less[d]][0] < self.M_num:  # 使用self前缀
+                                    index = [i for i in range(len(offspring_list[m])) if
+                                             offspring_list[m][i] == chg_job]
+                                    offspring_list[m][index[0]] = less[d]
+                                    job_count[chg_job][1] = index[0]  # 使用索引变量
+                                    job_count[chg_job][0] = job_count[chg_job][0] - 1
+                                    job_count[less[d]][0] = job_count[less[d]][0] + 1
+                                if job_count[chg_job][0] == self.M_num:  # 使用self前缀
+                                    break
         return offspring_list
+
+
 
 pt_tmp = pd.read_excel("JSP_dataset_ft06.xlsx", sheet_name="Processing Time", index_col=[0])
 ms_tmp = pd.read_excel("JSP_dataset_ft06.xlsx", sheet_name="Machines Sequence", index_col=[0])
@@ -72,3 +115,4 @@ JSPAGV = Encode(pt, ms, agv, J_num, M_num, A_num, population_size, num, agv_num)
 
 offspring_jobs = JSPAGV.initJobSequence()
 print("交叉后的种群列表：", offspring_jobs)
+print()
