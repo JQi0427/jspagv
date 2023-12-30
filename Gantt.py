@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class Encode:
@@ -72,17 +73,19 @@ boolean_agv = [0]*3  # 布尔型变量，如果agv空闲为0，agv不空闲则�
 location_agv = [0]*3  # agv位置初始化都在仓库
 process_time = [0]*3  # 记录agv不空闲时，那台机器上的pt，如现在agv从机器晕运输到机器二，记录该工件在机器二上的加工时间
 t = len(init_agv[0]) - 1
+tasks = [0] * M_num
 lasttime = [0]*3  # 记录agv运输成品到成品库的时间
 for i in range(num):
     temp_job = init_jobs[0][i]  # achieve job operation
     temp_machine = ms[temp_job][init_sequence[temp_job]]   # achieve related machine Mn+1
     temp_agv = init_agv[0][i]  # achieve related agv sequence
+    stattime = init_time[temp_machine]
     if init_sequence[temp_job] != 0:  # 不是工件的第一个工序
-        # Gets the machine where the workpiece was located in the previous operation
+        # 获取上一次操作中工件所在的机器
         last_machine = ms[temp_job][init_sequence[temp_job]-1] + 1
         if location_agv[temp_agv] != 0:  # 避免agv在初始化位置仓库产生的影响
             machine = location_agv[temp_agv] - 1  # agv在上一个任务结束时的位置
-            if machine != 6:
+            if machine != 6:  # 避免agv在成品库
                 temp_time = init_time[machine] - process_time[temp_agv]  # 该agv到达上一个任务的时间，上一个机器的时间减去加工时间 = agv到达时间
             else:
                 temp_time = lasttime[temp_agv]
@@ -166,9 +169,27 @@ for i in range(num):
        t = t-1
        lasttime[a] = init_time[temp_machine]
     init_sequence[temp_job] += 1
+    endtime = init_time[temp_machine]
+    tasks[temp_machine] = (stattime, endtime)
+
 print(init_time)
 
+# 绘制甘特图
+fig, ax = plt.subplots()
 
+# 设置y轴刻度
+y_ticks = [f'J{i+1}' for i in range(J_num)]
+ax.set_yticks(range(J_num))
+ax.set_yticklabels(y_ticks)
 
+# 绘制任务条形图
+for i, task in enumerate(tasks):
+    start_time, end_time = task
+    ax.barh(i, width=end_time-start_time, left=start_time, height=0.5, align='center')
 
+# 设置x轴和图表标题
+ax.set_xlabel('Time')
+ax.set_title('Gantt Chart')
 
+# 显示图表
+plt.show()
