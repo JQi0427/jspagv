@@ -223,6 +223,8 @@ for j in range(population_size):
             t = t - 1
             lasttime[a] = init_time[j][temp_machine]
         init_sequence[temp_job] += 1
+
+
 print(init_time)
 
 
