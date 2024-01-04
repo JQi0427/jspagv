@@ -125,12 +125,13 @@ for i in range(num):
                     init_time[temp_machine] += pt[temp_job][init_sequence[temp_job]]
                     job_starttime[temp_job][init_sequence[temp_job]] = init_time[temp_machine] - pt[temp_job][init_sequence[temp_job]]
                 else:
+                    k = init_time[temp_machine] - agv_time[temp_agv]
                     init_time[temp_machine] += pt[temp_job][init_sequence[temp_job]] + agv[last_machine][temp_machine + 1] +\
-                                               agv[location_agv[temp_agv]][last_machine] - (init_time[temp_machine] - agv_time[temp_agv])
+                                               agv[location_agv[temp_agv]][last_machine] - k
                     agv_time[temp_agv] = init_time[temp_machine] - pt[temp_job][init_sequence[temp_job]]
                     job_starttime[temp_job][init_sequence[temp_job]] = \
                         init_time[temp_machine] - (pt[temp_job][init_sequence[temp_job]] + agv[last_machine][temp_machine + 1] +\
-                        agv[location_agv[temp_agv]][last_machine]) + (init_time[temp_machine] - agv_time[temp_agv])
+                        agv[location_agv[temp_agv]][last_machine]) + k
             else:  # 上一个工序没完成
                 time = init_time[last_machine - 1] - init_time[temp_machine]
                 if time > agv[location_agv[temp_agv]][last_machine - 1]:
@@ -285,6 +286,6 @@ ax.set_xlabel('Time')
 ax.set_title('Gantt Chart')
 
 # 显示图表
-plt.show()
+#plt.show()
 
 
