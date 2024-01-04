@@ -119,9 +119,9 @@ print("交叉后的种群列表：", init_jobs)
 init_agv = JSPAGV.initAGVSequence()
 print("agv序列：",init_agv)
 
+init_time = [[0] * M_num]*population_size
 #计算时间:
 for j in range(population_size):
-    init_time = [[0] * M_num]*population_size
     init_sequence = [0] * M_num
     boolean_agv = [0] * 3  # 布尔型变量，如果agv空闲为0，agv不空闲则为1
     location_agv = [0] * 3  # agv位置初始化都在仓库
