@@ -80,6 +80,12 @@ lasttime = [0] * 3  # 记录agv运输成品到成品库的时间
 agv_time = [0] * 3  # 记录每个agv完成任务的结束时间
 job_time = []
 job_starttime = []
+operation = []
+for i in range(6):
+    row = []
+    for j in range(6):
+        row.append(0)
+    operation.append(row)
 for i in range(6):
     row = []
     for j in range(6):
@@ -220,6 +226,7 @@ for i in range(num):
             location_agv[temp_agv] = temp_machine + 1  # 记录该agv完成任务后的位置
             process_time[temp_agv] = pt[temp_job][init_sequence[temp_job]]
     job_time[temp_job][init_sequence[temp_job]] = init_time[temp_machine]
+    operation[temp_job][init_sequence[temp_job]] = init_time[temp_machine]
     if init_sequence[temp_job] == 5:  # 计算从机器上运输到产品库的时间
         a = init_agv[0][t]  # 获取分配的agv
         if location_agv[a] - 1 != 6:
@@ -232,17 +239,17 @@ for i in range(num):
             boolean_agv[a] = 1
         if boolean_agv[a] == 0:  # 判断agv是否空闲,0:空闲
             if init_time[temp_machine] - temp_time > agv[location_agv[a]][temp_machine + 1]:
-                job_time[temp_job][init_sequence[temp_job]] = init_time[temp_machine] + agv[temp_machine + 1][7]
+                operation[temp_job][init_sequence[temp_job]] = init_time[temp_machine] + agv[temp_machine + 1][7]
             else:
-                job_time[temp_job][init_sequence[temp_job]] = init_time[temp_machine] + agv[location_agv[a]][
+                operation[temp_job][init_sequence[temp_job]] = init_time[temp_machine] + agv[location_agv[a]][
                     temp_machine + 1] - (init_time[temp_machine] - temp_time) + agv[temp_machine + 1][7]
         else:
-            job_time[temp_job][init_sequence[temp_job]] = init_time[temp_machine] + temp_time - init_time[
+            operation[temp_job][init_sequence[temp_job]] = init_time[temp_machine] + temp_time - init_time[
                 temp_machine] + agv[location_agv[a]][temp_machine + 1] + agv[temp_machine + 1][7]
         location_agv[a] = 7
         t = t - 1
-        agv_time[a] = job_time[temp_job][init_sequence[temp_job]]
-        lasttime[a] = job_time[temp_job][init_sequence[temp_job]]
+        agv_time[a] = operation[temp_job][init_sequence[temp_job]]
+        lasttime[a] = operation[temp_job][init_sequence[temp_job]]
     init_sequence[temp_job] += 1
     endtime = init_time[temp_machine]
     # print("endtime",endtime)
