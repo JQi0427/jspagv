@@ -269,7 +269,6 @@ ax.set_yticks(range(J_num))
 ax.set_yticklabels(y_ticks)
 
 # 绘制任务条形图
-start_time = [0] * M_num
 init_sequence = [0] * M_num
 color = ['red', 'yellow', 'green', 'cyan', 'blue', 'pink']
 print(ms)
@@ -277,22 +276,17 @@ for i in range(num):
     job = init_jobs[0][i]
     machine = ms[job][init_sequence[job]]
     end_time = job_time[job][init_sequence[job]]
-    if init_sequence[job] == 0 or start_time[machine] > job_time[job][init_sequence[job] - 1]:
-        ax.barh(machine, width=end_time - start_time[machine], left=start_time[machine], height=0.5, align='center',
-                color=color[job])
-    else:
-        ax.barh(machine, width=end_time - job_time[job][init_sequence[job] - 1],
-                left=job_time[job][init_sequence[job] - 1], height=0.5, align='center', color=color[job])
-    start_time[machine] = end_time
+    start_time = job_starttime[job][init_sequence[job]]
+    ax.barh(machine, width=end_time - start_time,
+            left=start_time, height=0.5, align='center', color=color[job])
     init_sequence[job] += 1
 
-print(start_time)
 
 # 设置x轴和图表标题
 ax.set_xlabel('Time')
 ax.set_title('Gantt Chart')
 
 # 显示图表
-#plt.show()
+plt.show()
 
 
