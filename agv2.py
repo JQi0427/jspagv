@@ -88,7 +88,6 @@ class Encode:
         return offspring_list
 
 
-
 pt_tmp = pd.read_excel("JSP_dataset_ft06.xlsx", sheet_name="Processing Time", index_col=[0])
 ms_tmp = pd.read_excel("JSP_dataset_ft06.xlsx", sheet_name="Machines Sequence", index_col=[0])
 at_tmp = pd.read_excel("JSP_dataset_ft06.xlsx", sheet_name="AGV Time", index_col=[0])
@@ -96,7 +95,6 @@ at_tmp = pd.read_excel("JSP_dataset_ft06.xlsx", sheet_name="AGV Time", index_col
 dfshape = pt_tmp.shape
 J_num = dfshape[0]
 M_num = dfshape[1]
-
 
 A_num = 3
 num = J_num * M_num
@@ -256,13 +254,15 @@ for j in range(population_size):
                     location_agv[temp_agv] = temp_machine + 1  # 记录该agv完成任务后的位置
                     process_time[temp_agv] = pt[temp_job][init_sequence[temp_job]]
                 else:  # agv不在仓库
-                    init_time[j][temp_machine] += pt[temp_job][init_sequence[temp_job]] + agv[0][temp_machine + 1] + \
-                                               agv[0][location_agv[temp_agv]]
-                    agv_time[temp_agv] = init_time[j][temp_machine] - pt[temp_job][init_sequence[temp_job]]
-                    job_starttime[temp_job][init_sequence[temp_job]] = \
-                        init_time[j][temp_machine] - (pt[temp_job][init_sequence[temp_job]] + agv[0][temp_machine + 1] + \
-                                                   agv[0][location_agv[temp_agv]])
-                    # job_time[temp_job][init_sequence[temp_job]] = init_time[temp_machine]
+                    if init_time[j][temp_machine] > agv[0][temp_machine + 1] + agv[0][location_agv[temp_agv]] + agv_time[temp_agv]:
+                        init_time[j][temp_machine] += pt[temp_job][init_sequence[temp_job]]
+                        agv_time[temp_agv] = agv[0][temp_machine + 1] + agv[0][location_agv[temp_agv]] + agv_time[temp_agv]
+                        job_starttime[temp_job][init_sequence[temp_job]] = init_time[j][temp_machine] - pt[temp_job][init_sequence[temp_job]]
+                    else:
+                        job_starttime[temp_job][init_sequence[temp_job]] = init_time[j][temp_machine]
+                        init_time[j][temp_machine] = pt[temp_job][init_sequence[temp_job]] + agv[0][temp_machine + 1] + \
+                                               agv[0][location_agv[temp_agv]] + agv_time[temp_agv]
+                        agv_time[temp_agv] = init_time[j][temp_machine] - pt[temp_job][init_sequence[temp_job]]
                     location_agv[temp_agv] = temp_machine + 1  # 记录该agv完成任务后的位置
                     process_time[temp_agv] = pt[temp_job][init_sequence[temp_job]]
             else:
