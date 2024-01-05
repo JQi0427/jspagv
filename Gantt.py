@@ -56,14 +56,11 @@ agv = [list(map(int, at_tmp.iloc[i])) for i in range(M_num + 2)]  # AGV sequence
 
 JSPAGV = Encode(pt, ms, agv, J_num, M_num, A_num, population_size, num, agv_num)
 
-# init_jobs = JSPAGV.initJobSequence()
-init_jobs = [
-    [3, 5, 2, 4, 3, 5, 2, 5, 3, 1, 0, 0, 0, 1, 5, 3, 1, 0, 1, 0, 0, 2, 3, 4, 2, 5, 5, 1, 4, 4, 4, 3, 2, 4, 1, 2]]
+#init_jobs = JSPAGV.initJobSequence()
+init_jobs = [[1, 5, 3, 4, 3, 1, 5, 3, 5, 2, 0, 4, 0, 4, 1, 1, 0, 4, 3, 1, 4, 0, 2, 5, 2, 1, 0, 3, 2, 3, 5, 0, 2, 4, 5, 2]]
 print(init_jobs)
-# init_agv = JSPAGV.initAGVSequence()
-init_agv = [
-    [2, 0, 2, 1, 0, 2, 2, 1, 1, 1, 1, 0, 2, 0, 1, 0, 0, 2, 2, 0, 0, 0, 1, 2, 1, 0, 2, 0, 0, 2, 1, 1, 2, 0, 1, 2, 0, 1,
-     1, 2, 2, 1]]
+#init_agv = JSPAGV.initAGVSequence()
+init_agv = [[0, 1, 1, 2, 1, 2, 0, 1, 2, 2, 0, 2, 0, 2, 0, 0, 0, 1, 0, 1, 1, 2, 0, 0, 1, 2, 0, 0, 2, 0, 1, 1, 1, 2, 1, 1, 2, 2, 0, 1, 2, 2]]
 print(init_agv)
 
 # 计算含AGV的最大完工时间
