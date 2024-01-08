@@ -56,12 +56,15 @@ agv = [list(map(int, at_tmp.iloc[i])) for i in range(M_num + 2)]  # AGV sequence
 
 JSPAGV = Encode(pt, ms, agv, J_num, M_num, A_num, population_size, num, agv_num)
 
-#init_jobs = JSPAGV.initJobSequence()
-#init_agv = JSPAGV.initAGVSequence()
-init_jobs = [[0, 1, 2, 0, 3, 2, 0, 4, 4, 5, 5, 4, 1, 3, 0, 1, 4, 4, 3, 1, 3, 5, 1, 4, 2, 5, 0, 5, 2, 3, 2, 3, 0, 1, 2, 5]]
-init_agv = [[1, 2, 1, 1, 1, 1, 1, 0, 2, 2, 2, 0, 0, 1, 0, 0, 2, 2, 0, 2, 1, 2, 2, 2, 1, 0, 0, 0, 0, 0, 2, 0, 2, 0, 1, 1, 0, 1, 2, 1, 2, 1]]
-#init_jobs = [[3, 5, 2, 4, 3, 5, 2, 5, 3, 1, 0, 0, 0, 1, 5, 3, 1, 0, 1, 0, 0, 2, 3, 4, 2, 5, 5, 1, 4, 4, 4, 3, 2, 4, 1, 2]]
-#init_agv = [[2, 0, 2, 1, 0, 2, 2, 1, 1, 1, 1, 0, 2, 0, 1, 0, 0, 2, 2, 0, 0, 0, 1, 2, 1, 0, 2, 0, 0, 2, 1, 1, 2, 0, 1, 2, 0, 1, 1, 2, 2, 1]]
+init_jobs = JSPAGV.initJobSequence()
+init_agv = JSPAGV.initAGVSequence()
+# init_jobs = [[5, 3, 4, 5, 2, 5, 5, 1, 2, 4, 2, 3, 4, 1, 3, 3, 2, 4, 5, 4, 0, 0, 2, 4, 2, 0, 3, 1, 1, 1, 0, 5, 0, 1, 3, 0]]
+# init_agv = [[2, 0, 2, 2, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 2, 1, 1, 2, 0, 2, 2, 2, 2, 0, 2, 1, 2, 1, 0, 0, 0, 2, 1, 0, 2, 2, 0, 1, 0, 0, 1]]
+# init_jobs = [[3, 5, 2, 4, 3, 5, 2, 5, 3, 1, 0, 0, 0, 1, 5, 3, 1, 0, 1, 0, 0, 2, 3, 4, 2, 5, 5, 1, 4, 4, 4, 3, 2, 4, 1, 2]]
+# init_agv = [[2, 0, 2, 1, 0, 2, 2, 1, 1, 1, 1, 0, 2, 0, 1, 0, 0, 2, 2, 0, 0, 0, 1, 2, 1, 0, 2, 0, 0, 2, 1, 1, 2, 0, 1, 2, 0, 1, 1, 2, 2, 1]]
+# init_jobs = [[5, 5, 0, 3, 1, 2, 1, 2, 5, 0, 3, 3, 4, 5, 0, 2, 4, 3, 2, 3, 4, 1, 4, 3, 2, 2, 0, 1, 1, 4, 1, 0, 4, 0, 5, 5]]
+# init_agv = [[2, 2, 2, 1, 2, 0, 2, 2, 0, 0, 2, 0, 1, 2, 1, 0, 0, 1, 2, 0, 0, 2, 0, 2, 1, 0, 2, 1, 1, 0, 2, 1, 0, 1, 1, 1, 0, 0, 1, 2, 1, 1]]
+
 print(init_jobs)
 print(init_agv)
 
@@ -182,8 +185,8 @@ for i in range(num):
                                                     - agv_time[temp_agv]
                     else:
                         job_starttime[temp_job][init_sequence[temp_job]] = \
-                            init_time[temp_machine] - (agv[location_agv[temp_agv]][last_machine] + agv[last_machine][temp_machine + 1] \
-                                                       + pt[temp_job][init_sequence[temp_job]])
+                            init_time[temp_machine] - (agv[location_agv[temp_agv]][last_machine] + agv[last_machine][temp_machine + 1]\
+                                        + pt[temp_job][init_sequence[temp_job]])
                 agv_time[temp_agv] = init_time[temp_machine] - pt[temp_job][init_sequence[temp_job]]
             location_agv[temp_agv] = temp_machine + 1  # 记录该agv完成任务后的位置
             process_time[temp_agv] = pt[temp_job][init_sequence[temp_job]]
@@ -263,10 +266,11 @@ for i in range(num):
     endtime = init_time[temp_machine]
     # print("endtime",endtime)
     tasks[temp_machine] = (stattime, endtime)
-    print(tasks)
-print("init_time",init_time)
-print("job_starttime",job_starttime)
-print("job_time",job_time)
+    #print(tasks)
+print("init_time：",init_time)
+print("job_starttime：",job_starttime)
+print("job_time：",job_time)
+print("agv_time",agv_time)
 
 
 # 绘制甘特图

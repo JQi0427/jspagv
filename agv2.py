@@ -14,6 +14,7 @@ class Encode:
         self.population_size = population_size
         self.num = num  # Iteration
         self.agv_num = agv_num  # AGV iteration
+        print("0",self.pt)
 
     def initAGVSequence(self):
         population_AGVlist = []
@@ -212,17 +213,14 @@ for j in range(population_size):
                 location_agv[temp_agv] = temp_machine + 1  # 记录该agv完成任务后的位置
                 process_time[temp_agv] = pt[temp_job][init_sequence[temp_job]]
             else:  # agv不空闲
-                # 用agv到达机器的时间和当前时间对比，算出等待agv的时间
                 difference = temp_time - init_time[j][temp_machine]
                 # 判断该工件的前一个工序是否完成
                 if job_time[temp_job][init_sequence[temp_job] - 1] < init_time[j][temp_machine]:  # 上一个工序完成了
                     init_time[j][temp_machine] += pt[temp_job][init_sequence[temp_job]] + agv[last_machine][
-                        temp_machine + 1] + \
-                                               agv[location_agv[temp_agv]][last_machine] + difference
+                        temp_machine + 1] + agv[location_agv[temp_agv]][last_machine] + difference
                     agv_time[temp_agv] = init_time[j][temp_machine] - pt[temp_job][init_sequence[temp_job]]
                     job_starttime[temp_job][init_sequence[temp_job]] = \
-                        init_time[j][temp_machine] - (
-                                    pt[temp_job][init_sequence[temp_job]] + agv[last_machine][temp_machine + 1] + \
+                        init_time[j][temp_machine] - (pt[temp_job][init_sequence[temp_job]] + agv[last_machine][temp_machine + 1] + \
                                     agv[location_agv[temp_agv]][last_machine])
                 else:
                     if agv_time[temp_agv] + agv[location_agv[temp_agv]][last_machine] < job_time[temp_job][
@@ -230,16 +228,25 @@ for j in range(population_size):
                         init_time[j][temp_machine] = job_time[temp_job][init_sequence[temp_job] - 1] + agv[last_machine][
                             temp_machine + 1] + pt[temp_job][init_sequence[temp_job]]
                         job_starttime[temp_job][init_sequence[temp_job]] = \
-                            init_time[j][temp_machine] - (
-                                        agv[last_machine][temp_machine + 1] + pt[temp_job][init_sequence[temp_job]])
+                            init_time[j][temp_machine] - (agv[last_machine][temp_machine + 1] + pt[temp_job][init_sequence[temp_job]])
                     else:
                         init_time[j][temp_machine] = agv_time[temp_agv] + agv[location_agv[temp_agv]][last_machine] + \
                                                   agv[last_machine][temp_machine + 1] + pt[temp_job][
                                                       init_sequence[temp_job]]
-                        job_starttime[temp_job][init_sequence[temp_job]] = \
-                            init_time[j][temp_machine] - (agv[location_agv[temp_agv]][last_machine] + agv[last_machine][
-                                temp_machine + 1] + \
-                                                       pt[temp_job][init_sequence[temp_job]])
+                        if job_time[temp_job][init_sequence[temp_job] - 1] > agv_time[temp_agv]:
+                            job_starttime[temp_job][init_sequence[temp_job]] = \
+                                init_time[j][temp_machine] - (
+                                            agv[location_agv[temp_agv]][last_machine] + agv[last_machine][
+                                        temp_machine + 1] + \
+                                            pt[temp_job][init_sequence[temp_job]]) + job_time[temp_job][
+                                    init_sequence[temp_job] - 1] \
+                                - agv_time[temp_agv]
+                        else:
+                            job_starttime[temp_job][init_sequence[temp_job]] = \
+                                init_time[j][temp_machine] - (
+                                            agv[location_agv[temp_agv]][last_machine] + agv[last_machine][
+                                        temp_machine + 1] \
+                                            + pt[temp_job][init_sequence[temp_job]])
                     agv_time[temp_agv] = init_time[j][temp_machine] - pt[temp_job][init_sequence[temp_job]]
                 location_agv[temp_agv] = temp_machine + 1  # 记录该agv完成任务后的位置
                 process_time[temp_agv] = pt[temp_job][init_sequence[temp_job]]
