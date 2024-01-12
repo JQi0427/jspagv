@@ -263,39 +263,59 @@ for i in range(num):
     endtime = init_time[temp_machine]
     # print("endtime",endtime)
     tasks[temp_machine] = (stattime, endtime)
-    print(tasks)
+    # print(tasks)
 print("init_time",init_time)
 print("job_starttime",job_starttime)
 print("job_time",job_time)
 
 
 # 绘制甘特图
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(2, 1)
 
 # 设置y轴刻度
 y_ticks = [f'M{i + 1}' for i in range(J_num)]
-ax.set_yticks(range(J_num))
-ax.set_yticklabels(y_ticks)
+ax[0].set_yticks(range(J_num))
+ax[0].set_yticklabels(y_ticks)
 
 # 绘制任务条形图
 init_sequence = [0] * M_num
 color = ['red', 'yellow', 'green', 'cyan', 'blue', 'pink']
-#print(ms)
 for i in range(num):
     job = init_jobs[0][i]
     machine = ms[job][init_sequence[job]]
     end_time = job_time[job][init_sequence[job]]
     start_time = job_starttime[job][init_sequence[job]]
-    ax.barh(machine, width=end_time - start_time,
-            left=start_time, height=0.5, align='center', color=color[job])
+    ax[0].barh(machine, width=end_time - start_time,
+               left=start_time, height=0.5, align='center', color=color[job])
     init_sequence[job] += 1
 
-
 # 设置x轴和图表标题
-ax.set_xlabel('Time')
-ax.set_title('Gantt Chart')
+ax[0].set_title('Gantt Chart')
+
+# 绘制AGV甘特图
+y_ticks = [f'AGV{i}' for i in range(A_num)]
+ax[1].set_yticks(range(A_num))
+ax[1].set_yticklabels(y_ticks)
+init_sequence = [0] * M_num
+color = ['red', 'yellow', 'green', 'cyan', 'blue', 'pink']
+for i in range(num):
+    job = init_jobs[0][i]
+    agv = init_agv[0][i]
+    end_time = job_time[job][init_sequence[job]] - pt[job][init_sequence[job]]
+    start_time = job_starttime[job][init_sequence[job]]
+    ax[1].barh(agv, width=end_time - start_time,
+               left=start_time, height=0.5, align='center', color=color[job])
+    init_sequence[job] += 1
+for i in range(1,7):
+    agv = init_agv[0][-i]
+    end_time = operation[i-1][5]
+    start_time = job_time[i-1][5]
+    ax[1].barh(agv, width=end_time - start_time,
+               left=start_time, height=0.5, align='center', color='black')
+ax[1].set_xlabel('Time')
 
 # 显示图表
+plt.tight_layout()
 plt.show()
 
 
