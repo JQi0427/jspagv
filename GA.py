@@ -107,12 +107,13 @@ class Encode:
         return offspring_list
 
     # fitness value(calculate makespan)
-    def fitness(self,parent_list,offspring_list):
+    def fitness(self, parent_list, offspring_list):
         # 适应值（计算完工时间）
         total_chromosome = copy.deepcopy(parent_list) + copy.deepcopy(
             offspring_list)  # parent and offspring chromosomes combination
         chrom_fitness, chrom_fit = [], []
         total_fitness = 0
+        init_jobs = total_chromosome
         init_time = [[0] * self.M_num for _ in range(self.population_size)]
         init_agv = JSPAGV.initAGVSequence()
         # 计算时间:
@@ -353,8 +354,7 @@ class Encode:
                                                                            agv[temp_machine + 1][7]
                     else:
                         operation[temp_job][init_sequence[temp_job]] = init_time[j][temp_machine] + temp_time - \
-                                                                       init_time[j][
-                                                                           temp_machine] + agv[location_agv[a]][
+                                                                       init_time[j][temp_machine] + agv[location_agv[a]][
                                                                            temp_machine + 1] + \
                                                                        agv[temp_machine + 1][7]
                     location_agv[a] = 7
@@ -363,6 +363,10 @@ class Encode:
                     lasttime[a] = operation[temp_job][init_sequence[temp_job]]
                 init_sequence[temp_job] += 1
                 endtime = init_time[j][temp_machine]
+            makespan = max(init_time())
+            chrom_fitness.append(1 / makespan)
+            chrom_fit.append(makespan)
+            total_fitness = total_fitness + chrom_fitness[m]
         return
 
 
@@ -576,7 +580,6 @@ for j in range(population_size):
                     job_starttime[temp_job][init_sequence[temp_job]] = \
                         init_time[j][temp_machine] - (pt[temp_job][init_sequence[temp_job]] + agv[0][temp_machine + 1] + \
                                                    agv[0][location_agv[temp_agv]])
-                    # job_time[temp_job][init_sequence[temp_job]] = init_time[temp_machine]
                 location_agv[temp_agv] = temp_machine + 1  # 记录该agv完成任务后的位置
                 process_time[temp_agv] = pt[temp_job][init_sequence[temp_job]]
         job_time[temp_job][init_sequence[temp_job]] = init_time[j][temp_machine]

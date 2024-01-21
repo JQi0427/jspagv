@@ -13,7 +13,7 @@ class Encode:
         self.A_num = A_num  # AGV num
         self.population_size = population_size
         self.num = num  # Iteration
-        self.agv_num = agv_num  # AGV iteration¥
+        self.agv_num = agv_num  # AGV iteration
 
     def initJobSequence(self):
         population_joblist = []
@@ -38,9 +38,9 @@ class Encode:
         return population_AGVlist
 
 
-pt_tmp = pd.read_excel("JSP_dataset_ft06.xlsx", sheet_name="Processing Time", index_col=[0])
-ms_tmp = pd.read_excel("JSP_dataset_ft06.xlsx", sheet_name="Machines Sequence", index_col=[0])
-at_tmp = pd.read_excel("JSP_dataset_ft06.xlsx", sheet_name="AGV Time", index_col=[0])
+pt_tmp = pd.read_excel("JSP_dataset_ft04.xlsx", sheet_name="Processing Time", index_col=[0])
+ms_tmp = pd.read_excel("JSP_dataset_ft04.xlsx", sheet_name="Machines Sequence", index_col=[0])
+at_tmp = pd.read_excel("JSP_dataset_ft04.xlsx", sheet_name="AGV Time", index_col=[0])
 
 dfshape = pt_tmp.shape
 J_num = dfshape[0]
@@ -58,8 +58,8 @@ JSPAGV = Encode(pt, ms, agv, J_num, M_num, A_num, population_size, num, agv_num)
 
 #init_jobs = JSPAGV.initJobSequence()
 #init_agv = JSPAGV.initAGVSequence()
-init_jobs = [[0, 1, 2, 0, 3, 2, 0, 4, 4, 5, 5, 4, 1, 3, 0, 1, 4, 4, 3, 1, 3, 5, 1, 4, 2, 5, 0, 5, 2, 3, 2, 3, 0, 1, 2, 5]]
-init_agv = [[1, 2, 1, 1, 1, 1, 1, 0, 2, 2, 2, 0, 0, 1, 0, 0, 2, 2, 0, 2, 1, 2, 2, 2, 1, 0, 0, 0, 0, 0, 2, 0, 2, 0, 1, 1, 0, 1, 2, 1, 2, 1]]
+init_jobs = [[1, 0, 3, 0, 1, 3, 1, 2, 3, 2, 0, 1, 3, 2, 2, 0]]
+init_agv = [[1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0]]
 #init_jobs = [[3, 5, 2, 4, 3, 5, 2, 5, 3, 1, 0, 0, 0, 1, 5, 3, 1, 0, 1, 0, 0, 2, 3, 4, 2, 5, 5, 1, 4, 4, 4, 3, 2, 4, 1, 2]]
 #init_agv = [[2, 0, 2, 1, 0, 2, 2, 1, 1, 1, 1, 0, 2, 0, 1, 0, 0, 2, 2, 0, 0, 0, 1, 2, 1, 0, 2, 0, 0, 2, 1, 1, 2, 0, 1, 2, 0, 1, 1, 2, 2, 1]]
 print(init_jobs)
@@ -138,7 +138,6 @@ for i in range(num):
                     job_starttime[temp_job][init_sequence[temp_job]] = \
                         init_time[temp_machine] - (pt[temp_job][init_sequence[temp_job]] + agv[last_machine][temp_machine + 1] +\
                         agv[location_agv[temp_agv]][last_machine]) + k
-
             else:  # 上一个工序没完成
                 time = init_time[last_machine - 1] - init_time[temp_machine]
                 if time > agv[location_agv[temp_agv]][last_machine - 1]:
@@ -153,6 +152,8 @@ for i in range(num):
                     job_starttime[temp_job][init_sequence[temp_job]] = \
                         init_time[temp_machine] -(pt[temp_job][init_sequence[temp_job]] + agv[last_machine][temp_machine + 1]\
                         + agv[location_agv[temp_agv]][last_machine])
+                    agv_time[temp_agv]  = init_time[temp_machine] - pt[temp_job][init_sequence[temp_job]]
+                    agv_time[temp_agv] = init_time[temp_machine] - pt[temp_job][init_sequence[temp_job]]
             location_agv[temp_agv] = temp_machine + 1  # 记录该agv完成任务后的位置
             process_time[temp_agv] = pt[temp_job][init_sequence[temp_job]]
         else:  # agv不空闲
@@ -236,9 +237,9 @@ for i in range(num):
             process_time[temp_agv] = pt[temp_job][init_sequence[temp_job]]
     job_time[temp_job][init_sequence[temp_job]] = init_time[temp_machine]
     operation[temp_job][init_sequence[temp_job]] = init_time[temp_machine]
-    if init_sequence[temp_job] == 5:  # 计算从机器上运输到产品库的时间
+    if init_sequence[temp_job] == J_num - 1:  # 计算从机器上运输到产品库的时间
         a = init_agv[0][t]  # 获取分配的agv
-        if location_agv[a] - 1 != 6:
+        if location_agv[a] - 1 != M_num:
             temp_time = init_time[location_agv[a] - 1] - process_time[a]  # 该agv到达上一个任务的时间，上一个机器的时间减去加工时间 = agv到达时间
         else:
             temp_time = lasttime[a]
@@ -248,14 +249,14 @@ for i in range(num):
             boolean_agv[a] = 1
         if boolean_agv[a] == 0:  # 判断agv是否空闲,0:空闲
             if init_time[temp_machine] - temp_time > agv[location_agv[a]][temp_machine + 1]:
-                operation[temp_job][init_sequence[temp_job]] = init_time[temp_machine] + agv[temp_machine + 1][7]
+                operation[temp_job][init_sequence[temp_job]] = init_time[temp_machine] + agv[temp_machine + 1][M_num + 1]
             else:
                 operation[temp_job][init_sequence[temp_job]] = init_time[temp_machine] + agv[location_agv[a]][
-                    temp_machine + 1] - (init_time[temp_machine] - temp_time) + agv[temp_machine + 1][7]
+                    temp_machine + 1] - (init_time[temp_machine] - temp_time) + agv[temp_machine + 1][M_num + 1]
         else:
             operation[temp_job][init_sequence[temp_job]] = init_time[temp_machine] + temp_time - init_time[
-                temp_machine] + agv[location_agv[a]][temp_machine + 1] + agv[temp_machine + 1][7]
-        location_agv[a] = 7
+                temp_machine] + agv[location_agv[a]][temp_machine + 1] + agv[temp_machine + 1][M_num + 1]
+        location_agv[a] = M_num +1
         t = t - 1
         agv_time[a] = operation[temp_job][init_sequence[temp_job]]
         lasttime[a] = operation[temp_job][init_sequence[temp_job]]
